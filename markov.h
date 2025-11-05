@@ -9,7 +9,7 @@
 
 typedef struct cell{
   int sommet_arrivee;
-  float Proba;
+  float proba;
   cell *next;
 }cell;
 
@@ -21,6 +21,10 @@ typedef struct liste_adjacence {
   liste *tab;
   int taille;
 }liste_adjacence;
+
+cell* creat_cell(float prob, int arrivee);
+liste create_void_list();
+
 
 
 #endif //MARKOV_H
