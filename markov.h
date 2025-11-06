@@ -24,6 +24,11 @@ typedef struct liste_adjacence {
 
 cell* creat_cell(float prob, int arrivee);
 liste create_void_list();
+void ajouter_cellule(liste *l, int arrivee, float prob);
+void print_list(liste l, int sommet);
+liste_adjacence creer_liste_adjacence_vide(int taille);
+void afficher_liste_adjacence(liste_adjacence adj);
+liste_adjacence readGraph (const char* filename);
 
 
 
