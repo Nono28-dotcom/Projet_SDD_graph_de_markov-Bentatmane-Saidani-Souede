@@ -10,7 +10,7 @@
 typedef struct cell{
   int sommet_arrivee;
   float proba;
-  cell *next;
+  struct cell *next;
 }cell;
 
 typedef struct liste {
@@ -29,6 +29,7 @@ void print_list(liste l, int sommet);
 liste_adjacence creer_liste_adjacence_vide(int taille);
 void afficher_liste_adjacence(liste_adjacence adj);
 liste_adjacence readGraph (const char* filename);
+int verif_graphe_Markov(liste_adjacence adj);
 
 
 
