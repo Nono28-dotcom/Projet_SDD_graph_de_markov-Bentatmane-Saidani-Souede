@@ -109,5 +109,5 @@ void verif_graphe_Markov(liste_adjacence adj) {
     return;
   }
 }
-
+//
 

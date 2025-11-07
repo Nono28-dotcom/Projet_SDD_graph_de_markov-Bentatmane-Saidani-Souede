@@ -9,6 +9,6 @@
 // Déclaration de la fonction getID
 char *getID(int i);
 
-//
+////
 
 #endif //CHARGETID_H
