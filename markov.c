@@ -158,3 +158,5 @@ void fichier_txt(t_list_adj *my_list_adj) {
     fclose(file);
 }
 
+//
+
