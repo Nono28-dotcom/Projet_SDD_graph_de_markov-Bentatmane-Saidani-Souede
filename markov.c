@@ -5,6 +5,9 @@
 #include "markov.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include "hasse.c"
+#include "utils.c"
 
 
 cell* creat_cell(float prob, int arrivee){
@@ -105,3 +108,43 @@ int verif_graphe_Markov(liste_adjacence adj) {
 };
 
 
+
+int write_mermaid(const Adj *G, const char *path) {
+    FILE *f = fopen(path, "wt");
+    if (!f) {
+        perror("Erreur à l’ouverture du fichier Mermaid");
+        return 1;
+    }
+
+    fprintf(f, "---\n");
+    fprintf(f, "config:\n");
+    fprintf(f, "   layout: elk\n");
+    fprintf(f, "   theme: neo\n");
+    fprintf(f, "   look: neo\n");
+    fprintf(f, "---\n\n");
+    fprintf(f, "flowchart LR\n");
+
+    for (int i = 0; i < G->n; ++i) {
+        char *id = getID(i + 1);
+        fprintf(f, "%s((%d))\n", id, i + 1);
+        free(id);
+    }
+    fprintf(f, "\n");
+
+    for (int i = 0; i < G->n; ++i) {
+        char *from = getID(i + 1);
+        Arc *c = G->rows[i].head;
+        while (c) {
+            char *to = getID(c->to);
+            fprintf(f, "%s -->|%.2f|%s\n", from, c->p, to);
+            free(to);
+            c = c->next;
+        }
+        free(from);
+    }
+
+    fclose(f);
+    printf("\n Fichier Mermaid généré : %s\n", path);
+    printf("~>Copiez son contenu sur https://www.mermaidchart.com/\n");
+    return 0;
+}
