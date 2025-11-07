@@ -8,6 +8,8 @@
 #include <string.h>
 #include "hasse.c"
 #include "utils.c"
+#include "utils.h"
+#include "hasse.h"
 
 
 cell* creat_cell(float prob, int arrivee){
@@ -107,42 +109,39 @@ int verif_graphe_Markov(liste_adjacence adj) {
     return vrai;
 };
 
-int write_mermaid(const Adj *G, const char *path) {
-    FILE *f = fopen(path, "wt");
-    if (!f) {
-        perror("Erreur à l’ouverture du fichier Mermaid");
-        return 1;
-    }
+
+int export_to_mermaid(const liste_adjacence *adj, const char *filename) {
+    if (!adj || !filename) return 0;
+    FILE *f = fopen(filename, "w");
+    if (!f) { perror("opening mermaid file"); return 0; }
 
     fprintf(f, "---\n");
     fprintf(f, "config:\n");
-    fprintf(f, "   layout: elk\n");
-    fprintf(f, "   theme: neo\n");
-    fprintf(f, "   look: neo\n");
-    fprintf(f, "---\n\n");
+    fprintf(f, "  layout: elk\n");
+    fprintf(f, "  theme: neo\n");
+    fprintf(f, "  look: neo\n");
+    fprintf(f, "---\n");
     fprintf(f, "flowchart LR\n");
 
-    for (int i = 0; i < G->n; ++i) {
-        char *id = getID(i + 1);
+    for (int i = 0; i < adj->taille; ++i) {
+        char *id = getId(i + 1);
         fprintf(f, "%s((%d))\n", id, i + 1);
         free(id);
     }
     fprintf(f, "\n");
 
-    for (int i = 0; i < G->n; ++i) {
-        char *from = getID(i + 1);
-        Arc *c = G->rows[i].head;
-        while (c) {
-            char *to = getID(c->to);
-            fprintf(f, "%s -->|%.2f|%s\n", from, c->p, to);
-            free(to);
-            c = c->next;
+    for (int i = 0; i < adj->taille; ++i) {
+        cell *tmp = adj->tab[i].head;
+        char *id_from = getId(i + 1);
+        while (tmp != NULL) {
+            char *id_to = getId(tmp->sommet_arrivee);
+            fprintf(f, "%s -->|%.2f|%s\n", id_from, tmp->proba, id_to);
+            free(id_to);
+            tmp = tmp->next;
         }
-        free(from);
+        free(id_from);
     }
 
     fclose(f);
-    printf("\n Fichier Mermaid généré : %s\n", path);
-    printf("~>Copiez son contenu sur https://www.mermaidchart.com/\n");
-    return 0;
+    return 1;
 }

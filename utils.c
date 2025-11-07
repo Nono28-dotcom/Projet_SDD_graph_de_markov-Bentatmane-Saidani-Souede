@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "markov.c"
 #include "utils.h"
+#include "markov.h"
 
 static char *getID(int i)
 {
