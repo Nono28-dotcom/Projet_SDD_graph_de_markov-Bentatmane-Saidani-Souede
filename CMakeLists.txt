@@ -2,12 +2,13 @@ cmake_minimum_required(VERSION 3.15)
 project(MarkovProject C)
 
 set(CMAKE_C_STANDARD 11)
-set(SOURCES
+set(SOURCES)
+
+add_executable(main
         main.c
         markov.c
         utils.c
         hasse.c
-        # ajoute ici tous tes .c
-)
-
-add_executable(main ${SOURCES})
+        markov.h
+        utils.h
+        hasse.h)

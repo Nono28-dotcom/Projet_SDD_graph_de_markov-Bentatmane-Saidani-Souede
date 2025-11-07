@@ -13,7 +13,7 @@ int main(void) {
 
     if (export_to_mermaid(&g, mermaid_file)) {
         printf("Fichier Mermaid généré : %s\n", mermaid_file);
-        printf("Copie/colle son contenu dans https://www.mermaidchart.com/\n");
+        printf("Met son contenu dans https://www.mermaidchart.com/\n");
     } else {
         fprintf(stderr, "Erreur lors de la génération du fichier Mermaid.\n");
     }
