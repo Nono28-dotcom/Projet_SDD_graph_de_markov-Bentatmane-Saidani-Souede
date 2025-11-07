@@ -109,54 +109,5 @@ void verif_graphe_Markov(liste_adjacence adj) {
     return;
   }
 }
-void fichier_txt(t_list_adj *my_list_adj) {
-    if (!my_list_adj || my_list_adj->size <= 0 || !my_list_adj->tab) {
-        fprintf(stderr, "Graphe invalide.\n");
-        return;
-    }
 
-    const char *filename = "test.txt";
-    FILE *file = fopen(filename, "w");
-    if (!file) {
-        perror("Erreur lors de l’ouverture du fichier");
-        return;
-    }
-
-    int size = my_list_adj->size;
-
-    // Entête du fichier Mermaid
-    fprintf(file, "---\n");
-    fprintf(file, "config:\n");
-    fprintf(file, "  layout: elk\n");
-    fprintf(file, "  theme: neo\n");
-    fprintf(file, "  look: neo\n");
-    fprintf(file, "---\n\n");
-    fprintf(file, "flowchart LR\n\n");
-
-    // Déclaration des sommets
-    for (int i = 0; i < size; i++) {
-        char id[10];
-        strcpy(id, getID(i + 1));  // copier le buffer statique
-        fprintf(file, "%s((%d))\n", id, i + 1);
-    }
-    fprintf(file, "\n");
-
-    // Arêtes
-    for (int i = 0; i < size; i++) {
-        s_cell *curr = my_list_adj->tab[i].head;
-        char from[10];
-        strcpy(from, getID(i + 1));  // sommet de départ
-
-        while (curr != NULL) {
-            char to[10];
-            strcpy(to, getID(curr->s_arrive));  // sommet d'arrivée réel
-            fprintf(file, "%s -->|%.2f|%s\n", from, curr->s_proba, to);
-            curr = curr->next;
-        }
-    }
-
-    fclose(file);
-}
-
-//
 
