@@ -6,13 +6,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "hasse.c"
-#include "utils.c"
 #include "utils.h"
 #include "hasse.h"
 
 
-cell* creat_cell(float prob, int arrivee){
+cell* creat_cell(float prob, int arrivee) {
   cell* new_cell = (cell*)malloc(sizeof(cell));
   if (new_cell == NULL){
     return NULL;
@@ -28,7 +26,7 @@ liste create_void_list() {
   liste l;
   l.head = NULL;
   return l;
-};
+}
 
 
 void ajouter_cellule(liste *l, int arrivee, float prob) {
@@ -111,9 +109,12 @@ int verif_graphe_Markov(liste_adjacence adj) {
 
 
 int export_to_mermaid(const liste_adjacence *adj, const char *filename) {
-    if (!adj || !filename) return 0;
+    if (!adj || !filename)
+      return 0;
     FILE *f = fopen(filename, "w");
-    if (!f) { perror("opening mermaid file"); return 0; }
+    if (!f) {
+      perror("opening mermaid file"); return 0;
+    }
 
     fprintf(f, "---\n");
     fprintf(f, "config:\n");
@@ -124,7 +125,7 @@ int export_to_mermaid(const liste_adjacence *adj, const char *filename) {
     fprintf(f, "flowchart LR\n");
 
     for (int i = 0; i < adj->taille; ++i) {
-        char *id = getId(i + 1);
+        char *id = getID(i + 1);
         fprintf(f, "%s((%d))\n", id, i + 1);
         free(id);
     }
@@ -132,9 +133,9 @@ int export_to_mermaid(const liste_adjacence *adj, const char *filename) {
 
     for (int i = 0; i < adj->taille; ++i) {
         cell *tmp = adj->tab[i].head;
-        char *id_from = getId(i + 1);
+        char *id_from = getID(i + 1);
         while (tmp != NULL) {
-            char *id_to = getId(tmp->sommet_arrivee);
+            char *id_to = getID(tmp->sommet_arrivee);
             fprintf(f, "%s -->|%.2f|%s\n", id_from, tmp->proba, id_to);
             free(id_to);
             tmp = tmp->next;

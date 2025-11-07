@@ -1,5 +1,8 @@
-#include <malloc.h>
+
+/*
 #include "hasse.h"
+#include <malloc.h>
+
 
 
 void removeTransitiveLinks(t_link_array *p_link_array)
@@ -47,3 +50,4 @@ void removeTransitiveLinks(t_link_array *p_link_array)
         }
     }
 }
+*/

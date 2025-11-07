@@ -4,8 +4,8 @@
 
 #ifndef MARKOV_H
 #define MARKOV_H
-
 #include <stdio.h>
+#include <stdlib.h>
 
 typedef struct cell{
   int sommet_arrivee;
@@ -30,6 +30,7 @@ liste_adjacence creer_liste_adjacence_vide(int taille);
 void afficher_liste_adjacence(liste_adjacence adj);
 liste_adjacence readGraph (const char* filename);
 int verif_graphe_Markov(liste_adjacence adj);
+int export_to_mermaid(const liste_adjacence *adj, const char *filename);
 
 
 
