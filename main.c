@@ -7,7 +7,7 @@
 
 int main(void) {
     const char *input = "../Data/exemple1.txt";
-    const char *mermaid_file = "../exemple_step3_mermaid.txt";
+    const char *mermaid_file = "../sortie_effectuee.txt";
 
     liste_adjacence g = readGraph(input);
 
