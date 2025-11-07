@@ -52,7 +52,7 @@ liste_adjacence creer_liste_adjacence_vide(int taille) {
   adj.taille = taille;
   adj.tab = (liste*)malloc(taille * sizeof(liste));
   if (!adj.tab) {
-    exit(EXIT_FAILURE);
+    return NULL;
   }
   for (int i = 0; i < taille; i++)
     adj.tab[i] = create_void_list();
@@ -88,25 +88,31 @@ liste_adjacence readGraph (const char* filename) {
 };
 
 
-int verif_graphe_Markov(liste_adjacence adj) {
+void verif_graphe_Markov(liste_adjacence adj) {
   int vrai;
   vrai = 1;
-  for (int i = 0; i < adj.taille; i++) {
-    float cmp = 0.0;
-    cell *tmp = adj.tab[i].head;
-    while (tmp != NULL) {
-      cmp = cmp + tmp->proba;
-      tmp = tmp->next;
+  int cmp = 0;
+  while (vrai == 1) {
+    for (int i = 0; i < adj.taille; i++) {
+      for (int j = 0; j < adj.taille; j++) {
+        cmp = cmp + adj.tab[i][j].proba;
       }
-    if (cmp < 0.999 || cmp > 1.001) {
-      printf("Le graphe n’est pas un graphe de Markov car P = %f .\n", cmp);
-      vrai = 0;
+      if (cmp < 0.99 || cmp > 1.00) {
+        vrai = 0;
       }
+      cmp = 0;
     }
-    printf("Le graphe est un graphe de Markov.\n");
-    return vrai;
-};
-
+  }
+  if (vrai == 1){
+    printf("%c", 'Le graphe est un graphe de Markov\n');
+    return;
+  }
+  else {
+    printf("%c", 'Le graphe n’est pas un graphe de Markov\n');
+    return;
+  }
+}
+//
 
 
 int write_mermaid(const Adj *G, const char *path) {
