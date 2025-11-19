@@ -103,7 +103,7 @@ int verif_graphe_Markov(liste_adjacence adj) {
        vrai = 0;
       }
     }
-    printf("Le graphe est un graphe de Markov.");
+    printf("Le graphe est un graphe de Markov.\n");
     return vrai;
 };
 
