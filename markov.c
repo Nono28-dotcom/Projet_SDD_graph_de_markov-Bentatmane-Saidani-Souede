@@ -39,41 +39,54 @@ liste create_void_list() {
 
 void ajouter_cellule(liste *l, int arrivee, float prob) {
   cell *new_cell = creat_cell(prob, arrivee);
-  //injecte la cellule dans la l
+  //injecte les champs prob et arrivé dans la cellule
   new_cell->next = l->head;
+  //insère en tête de liste (le next deviens l'ancien head)
   l->head = new_cell;
+  //on ajoute la cellule dans la liste
 };
 
+//afficher les arêtes sortantes d'un sommet
 
 void print_list(liste l, int sommet) {
   printf("Liste pour le sommet %d : [head @]", sommet);
   cell *tmp = l.head;
+  //initialise le pointeur de parcours
   while (tmp != NULL) {
     printf(" -> (%d, %.2f)", tmp->sommet_arrivee, tmp->proba);
     tmp = tmp->next;
+    //parcours la liste et s'arrete lorsque next=NULL (la liste est finie)
   }
   printf("\n");
 };
 
+//la fonction creer_liste_adjacence_vide permet de creer une liste dont chaque case contiendra une sous liste des aretes sortantes d'u sommet
+//On peut assimiler cette liste a une matrice de probabilité du graph
 
 liste_adjacence creer_liste_adjacence_vide(int taille) {
   liste_adjacence adj;
   adj.taille = taille;
   adj.tab = (liste*)malloc(taille * sizeof(liste));
+  //initialise la taille du tableau et alloue de l'espace pour celui ci en fonction de la taille
   if (!adj.tab) {
     exit(EXIT_FAILURE);
   }
+  //sécurité au cas ou l'allocation échoue
   for (int i = 0; i < taille; i++)
     adj.tab[i] = create_void_list();
   return adj;
+  //boucle pour insérer les liste dans la liste d'adjacence
 };
 
+
+//cette fonction afficher_liste_adjacence parcours la liste d'adjacence et l'affiche
 
 void afficher_liste_adjacence(liste_adjacence adj) {
   for (int i = 0; i < adj.taille; i++) {
     print_list(adj.tab[i], i + 1);
   }
 };
+
 
 
 liste_adjacence readGraph (const char* filename) {
