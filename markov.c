@@ -9,28 +9,37 @@
 #include "utils.h"
 #include "hasse.h"
 
+//la fonction create cell crée le type cellule en prenant en entrée ses champs prob (contenant la probabilité pour aller d'un sommet à un autre) et arrivee (contenant le sommet vers lequel la probabilité est dirigé)
+//on assimile cet cellule aux arêtes du graph
 
 cell* creat_cell(float prob, int arrivee) {
   cell* new_cell = (cell*)malloc(sizeof(cell));
+  //on alloue l'espace dynamiquement
   if (new_cell == NULL){
     return NULL;
   }
+  //lignes de sécurité au cas où la mémoire n'est pas allouée
   new_cell->proba=prob;
   new_cell->sommet_arrivee=arrivee;
   new_cell->next=NULL;
+  //la cellule n'a pas besoin de champ next, on fixe alors la valeure a NULL
   return new_cell;
 };
 
+//la fonction create_void_list crée une liste vide qui servira plus tard a contenir l'ensemble des cellules
 
 liste create_void_list() {
   liste l;
   l.head = NULL;
+    //initialise le champ head à NULL
   return l;
 }
 
+//La fonction ajouter_cellule prends en entrée la liste et les valeurs des champs prob et arrivee afin d'insérer une cellule dans la liste
 
 void ajouter_cellule(liste *l, int arrivee, float prob) {
   cell *new_cell = creat_cell(prob, arrivee);
+  //injecte la cellule dans la l
   new_cell->next = l->head;
   l->head = new_cell;
 };

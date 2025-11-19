@@ -1,4 +1,10 @@
-/Applications/CLion.app/Contents/bin/cmake/mac/aarch64/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/Applications/CLion.app/Contents/bin/ninja/mac/aarch64/ninja -G Ninja -S /Users/laetitia/Projet_SDD_graph_de_markov-Bentatmane-Saidani-Souede -B /Users/laetitia/Projet_SDD_graph_de_markov-Bentatmane-Saidani-Souede/cmake-build-debug
--- Configuring done (0.0s)
--- Generating done (0.0s)
--- Build files have been written to: /Users/laetitia/Projet_SDD_graph_de_markov-Bentatmane-Saidani-Souede/cmake-build-debug
+"C:\Users\nsoue\AppData\Local\JetBrains\CLion 2024.3.4\bin\cmake\win\x64\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug -G "MinGW Makefiles" -S C:\Users\nsoue\CLionProjects\Projet_SDD_graph_de_markov-Bentatmane-Saidani-Souede -B C:\Users\nsoue\CLionProjects\Projet_SDD_graph_de_markov-Bentatmane-Saidani-Souede\cmake-build-debug
+-- The C compiler identification is GNU 13.1.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: C:/Users/nsoue/AppData/Local/JetBrains/CLion 2024.3.4/bin/mingw/bin/gcc.exe - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Configuring done (3.7s)
+-- Generating done (0.1s)
+-- Build files have been written to: C:/Users/nsoue/CLionProjects/Projet_SDD_graph_de_markov-Bentatmane-Saidani-Souede/cmake-build-debug
