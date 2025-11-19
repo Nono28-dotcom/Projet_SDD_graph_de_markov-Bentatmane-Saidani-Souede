@@ -111,23 +111,26 @@ liste_adjacence readGraph (const char* filename) {
 
 
 int verif_graphe_Markov(liste_adjacence adj) {
-  int vrai;
-  vrai = 1;
+  int vrai = 1;
   for (int i = 0; i < adj.taille; i++) {
     float cmp = 0.0;
     cell *tmp = adj.tab[i].head;
     while (tmp != NULL) {
-       cmp += tmp->proba;
-       tmp = tmp->next;
+      cmp += tmp->proba;
+      tmp = tmp->next;
     }
     if (cmp < 0.99 || cmp > 1.00) {
-       printf("Le graphe n’est pas un graphe de Markov car P = %f \n", cmp);
-       vrai = 0;
-      }
+      printf("Le sommet %d n'est pas valide (P = %f)\n", i, cmp);
+      vrai = 0;
     }
+  }
+  if (vrai) {
     printf("Le graphe est un graphe de Markov.\n");
-    return vrai;
-};
+  } else {
+    printf("Le graphe n'est pas un graphe de Markov.\n");
+  }
+  return vrai;
+}
 
 
 int export_to_mermaid(const liste_adjacence *adj, const char *filename) {
