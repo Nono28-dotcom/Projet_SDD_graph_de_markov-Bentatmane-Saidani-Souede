@@ -87,24 +87,29 @@ void afficher_liste_adjacence(liste_adjacence adj) {
   }
 };
 
-
+//la fonction readGraph permet de lire in fichier contenant un graph et de le reconstruire sur C
 
 liste_adjacence readGraph (const char* filename) {
   FILE *file = fopen(filename, "rt");
+  //ouvre le fichier en mode lecture texte
   int nbvert, depart, arrivee;
   float proba;
   if (file == NULL) {
     perror("Could not open file for reading");
     exit(EXIT_FAILURE);
   }
+  //verifie l'existence du fichier
   if (fscanf(file, "%d", &nbvert) != 1){
     perror("Could not read number of vertices");
     exit(EXIT_FAILURE);
   }
+  //verifie l'ouverture
   liste_adjacence adj = creer_liste_adjacence_vide(nbvert);
+  //crée le tableau d'adjacence vide
   while (fscanf(file, "%d %d %f", &depart, &arrivee, &proba) == 3){
       ajouter_cellule(&adj.tab[depart - 1], arrivee - 1, proba);
   }
+  //parcours du fichier et
   fclose(file);
   return adj;
 };
