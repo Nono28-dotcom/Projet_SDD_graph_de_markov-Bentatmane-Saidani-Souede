@@ -22,6 +22,8 @@ typedef struct liste_adjacence {
   int taille;
 }liste_adjacence;
 
+
+
 cell* creat_cell(float prob, int arrivee);
 liste create_void_list();
 void ajouter_cellule(liste *l, int arrivee, float prob);

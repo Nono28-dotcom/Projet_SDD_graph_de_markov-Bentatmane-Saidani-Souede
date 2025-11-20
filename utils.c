@@ -7,8 +7,11 @@
 
 char *getID(int i)
 {
-    // translate from 1,2,3, .. ,500+ to A,B,C,..,Z,AA,AB,...
-    static char buffer[10];
+    static char buffers[4][10];  // 4 buffers pour éviter l'écrasement
+    static int current = 0;
+    char *buffer = buffers[current];
+    current = (current + 1) % 4;  // Rotation des buffers
+
     char temp[10];
     int index = 0;
 
@@ -19,7 +22,6 @@ char *getID(int i)
         i = (i / 26) - 1;
     }
 
-    // Reverse the string to get the correct order
     for (int j = 0; j < index; j++)
     {
         buffer[j] = temp[index - j - 1];
