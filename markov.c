@@ -43,7 +43,7 @@ void ajouter_cellule(liste *l, int arrivee, float prob) {
   new_cell->next = l->head;
   //insère en tête de liste (le next deviens l'ancien head)
   l->head = new_cell;
-  //on ajoute la cellule dans la liste
+
 };
 
 //afficher les arêtes sortantes d'un sommet
@@ -103,7 +103,7 @@ liste_adjacence readGraph (const char* filename) {
   }
   liste_adjacence adj = creer_liste_adjacence_vide(nbvert);
   while (fscanf(file, "%d %d %f", &depart, &arrivee, &proba) == 3){
-    ajouter_cellule(&adj.tab[depart - 1], arrivee, proba);
+      ajouter_cellule(&adj.tab[depart - 1], arrivee - 1, proba);
   }
   fclose(file);
   return adj;
@@ -157,13 +157,11 @@ int export_to_mermaid(const liste_adjacence *adj, const char *filename) {
 
   for (int i = 0; i < adj->taille; ++i) {
     cell *tmp = adj->tab[i].head;
-    char *id_from = getID(i + 1);
     while (tmp != NULL) {
-      char *id_to = getID(tmp->sommet_arrivee);
-      fprintf(f, "%s -->|%.2f|%s\n", id_from, tmp->proba, id_to);
+      fprintf(f, "%s -->|%.2f|%s\n", getID(i + 1), tmp->proba, getID(tmp->sommet_arrivee + 1));
       tmp = tmp->next;
     }
-  }
+}
   fclose(f);
   return 1;
 }
