@@ -109,25 +109,35 @@ liste_adjacence readGraph (const char* filename) {
   while (fscanf(file, "%d %d %f", &depart, &arrivee, &proba) == 3){
     ajouter_cellule(&adj.tab[depart - 1], arrivee, proba);
   }
-  //parcours du fichier et
+  //parcours du fichier et insertion dans la liste
   fclose(file);
   return adj;
 };
 
 
+
+//Cette fonction permet de vérifier si un graph est un graph de markov, donc de savoir si la somme de toutes les probas
+//sortantes d'un sommet sont égales à 1
+
 int verif_graphe_Markov(liste_adjacence adj) {
   int vrai = 1;
+  //initialise la variable de "vérité" à vrai
   for (int i = 0; i < adj.taille; i++) {
     float cmp = 0.0;
+    //initialise le compteur
     cell *tmp = adj.tab[i].head;
+    //initialise un pointeur qui pointe sur le champ head de la sous liste
     while (tmp != NULL) {
       cmp += tmp->proba;
       tmp = tmp->next;
+      //incrémente le compteur est passe à l'arête suivante
     }
+    // parcours toute la liste d'adjacence, sous listes par sous listes, et somme la valeur des arrêtes avec un compteur
     if (cmp < 0.99 || cmp > 1.00) {
       printf("Le sommet %d n'est pas valide (P = %f)\n", i, cmp);
       vrai = 0;
     }
+    //verifie si la somme est comprise entre 0.99 et 1, renvoie faux dans le cas contraire
   }
   if (vrai) {
     printf("Le graphe est un graphe de Markov.\n");
@@ -138,12 +148,17 @@ int verif_graphe_Markov(liste_adjacence adj) {
 }
 
 
+//la fonction export_to_mermaid prends un graph en entrée et l'exporte en format mermaid pour avoir une visualisation
+
 int export_to_mermaid(const liste_adjacence *adj, const char *filename) {
   if (!adj || !filename)
     return 0;
+  // verifie les pointeurs (liste d'adjacence et fichier)
   FILE *f = fopen(filename, "w");
+  // ouvre le fichier en mode écriture
   if (!f) {
     perror("opening mermaid file"); return 0;
+    // retourne une erreur au cas ou un problème a lieu lors de l'ouverture du fichier
   }
 
   fprintf(f, "---\n");
@@ -153,10 +168,13 @@ int export_to_mermaid(const liste_adjacence *adj, const char *filename) {
   fprintf(f, "  look: neo\n");
   fprintf(f, "---\n");
   fprintf(f, "flowchart LR\n");
+  //écrit le format pris en charge par mermaid dans le fichier (en tête mermaid)
 
   for (int i = 0; i < adj->taille; ++i) {
     char *id = getID(i + 1);
+    //génére un identifiant mermaid unique
     fprintf(f, "%s((%d))\n", id, i + 1);
+    //crée un sommet
   }
   fprintf(f, "\n");
 
@@ -169,6 +187,7 @@ int export_to_mermaid(const liste_adjacence *adj, const char *filename) {
       tmp = tmp->next;
     }
   }
+  // parcours la liste d'adjacence et écrit dans le fichier la valeur des arrêtes
   fclose(f);
   return 1;
 }
