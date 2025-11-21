@@ -4,6 +4,7 @@
 #include "hasse.h"
 #include "utils.h"
 #include "markov.h"
+#include "hasse.h"
 
 int main(void) {
     char fichier[256];
@@ -39,8 +40,23 @@ int main(void) {
     printf("\nAlgorithme de Tarjan :\n");
     t_partition *partition = tarjan(g);
     afficher_partition(partition);
-    liberer_partition(partition);
 
+    printf("\nDiagramme de Hasse :\n");
+    t_liens_array *liens = construire_hasse(g, partition);
+    printf("Nombre de liens entre classes (avec redondances) : %d\n", liens->nb_liens);
+
+
+    removeTransitiveLinks(liens);
+    printf("Nombre de liens entre classes (sans redondances) : %d\n", liens->nb_liens);
+
+    if (export_hasse_to_mermaid(partition, liens, "../hasse.txt")) {
+        printf("Diagramme de Hasse généré : ../hasse.txt\n");
+    }
+
+    analyser_caracteristiques(partition, liens);
+
+    liberer_liens_array(liens);
+    liberer_partition(partition);
 
     return 0;
 }

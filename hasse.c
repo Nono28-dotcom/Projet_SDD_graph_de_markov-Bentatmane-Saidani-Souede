@@ -1,33 +1,32 @@
-
-/*
 #include "hasse.h"
-#include <malloc.h>
+#include <stdlib.h>
+#include "markov.h"
 
 
 
-void removeTransitiveLinks(t_link_array *p_link_array)
+void removeTransitiveLinks(t_liens_array *p_liens_array)
 {
     int i = 0;
-    while (i < p_link_array->log_size)
+    while (i < p_liens_array->nb_liens)
     {
-        t_link link1 = p_link_array->links[i];
+        t_lien link1 = p_liens_array->liens[i];
         int j = 0;
         int to_remove = 0;
-        while (j < p_link_array->log_size && !to_remove)
+        while (j < p_liens_array->nb_liens && !to_remove)
         {
             if (j != i)
             {
-                t_link link2 = p_link_array->links[j];
-                if (link1.from == link2.from)
+                t_lien link2 = p_liens_array->liens[j];
+                if (link1.classe_depart == link2.classe_depart)
                 {
-                    // look for a link from link2.to to link1.to
                     int k = 0;
-                    while (k < p_link_array->log_size && !to_remove)
+                    while (k < p_liens_array->nb_liens && !to_remove)
                     {
                         if (k != j && k != i)
                         {
-                            t_link link3 = p_link_array->links[k];
-                            if ((link3.from == link2.to) && (link3.to == link1.to))
+                            t_lien link3 = p_liens_array->liens[k];
+                            if ((link3.classe_depart == link2.classe_arrivee) &&
+                                (link3.classe_arrivee == link1.classe_arrivee))
                             {
                                 to_remove = 1;
                             }
@@ -40,9 +39,8 @@ void removeTransitiveLinks(t_link_array *p_link_array)
         }
         if (to_remove)
         {
-            // remove link1 by replacing it with the last link
-            p_link_array->links[i] = p_link_array->links[p_link_array->log_size - 1];
-            p_link_array->log_size--;
+            p_liens_array->liens[i] = p_liens_array->liens[p_liens_array->nb_liens - 1];
+            p_liens_array->nb_liens--;
         }
         else
         {
@@ -50,4 +48,3 @@ void removeTransitiveLinks(t_link_array *p_link_array)
         }
     }
 }
-*/

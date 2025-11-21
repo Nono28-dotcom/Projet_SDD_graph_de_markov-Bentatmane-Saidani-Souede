@@ -83,5 +83,25 @@ t_partition* tarjan(liste_adjacence adj);
 
 
 
+typedef struct {
+    int classe_depart;
+    int classe_arrivee;
+} t_lien;
+
+typedef struct {
+    t_lien *liens;
+    int nb_liens;
+    int capacite;
+} t_liens_array;
+
+
+t_liens_array* creer_liens_array();
+int lien_existe(t_liens_array *array, int depart, int arrivee);
+void ajouter_lien(t_liens_array *array, int depart, int arrivee);
+int* creer_tableau_sommet_vers_classe(t_partition *part, int nb_sommets);
+t_liens_array* construire_hasse(liste_adjacence adj, t_partition *part);
+int export_hasse_to_mermaid(t_partition *part, t_liens_array *liens, const char *filename);
+void liberer_liens_array(t_liens_array *array);
+int analyser_caracteristiques(t_partition *part, t_liens_array *liens);
 
 #endif //MARKOV_H

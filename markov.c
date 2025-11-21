@@ -367,3 +367,190 @@ t_partition* tarjan(liste_adjacence adj) {
 
     return part;
 }
+
+
+
+t_liens_array* creer_liens_array() {
+    t_liens_array *array = (t_liens_array*)malloc(sizeof(t_liens_array));
+    array->liens = NULL;
+    array->nb_liens = 0;
+    array->capacite = 0;
+    return array;
+}
+
+
+int lien_existe(t_liens_array *array, int depart, int arrivee) {
+    for (int i = 0; i < array->nb_liens; i++) {
+        if (array->liens[i].classe_depart == depart &&
+            array->liens[i].classe_arrivee == arrivee) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+
+void ajouter_lien(t_liens_array *array, int depart, int arrivee) {
+    if (lien_existe(array, depart, arrivee)) {
+        return;
+    }
+
+    if (array->nb_liens >= array->capacite) {
+        array->capacite = (array->capacite == 0) ? 2 : array->capacite * 2;
+        array->liens = (t_lien*)realloc(array->liens, array->capacite * sizeof(t_lien));
+    }
+
+    array->liens[array->nb_liens].classe_depart = depart;
+    array->liens[array->nb_liens].classe_arrivee = arrivee;
+    array->nb_liens++;
+}
+
+
+int* creer_tableau_sommet_vers_classe(t_partition *part, int nb_sommets) {
+    int *sommet_vers_classe = (int*)malloc(nb_sommets * sizeof(int));
+
+
+    for (int i = 0; i < nb_sommets; i++) {
+        sommet_vers_classe[i] = -1;
+    }
+
+
+    for (int i = 0; i < part->nb_classes; i++) {
+        for (int j = 0; j < part->classes[i].nb_sommets; j++) {
+            int sommet_id = part->classes[i].sommets[j].identifiant;
+            sommet_vers_classe[sommet_id] = i;
+        }
+    }
+
+    return sommet_vers_classe;
+}
+
+
+t_liens_array* construire_hasse(liste_adjacence adj, t_partition *part) {
+    t_liens_array *liens = creer_liens_array();
+
+
+    int *sommet_vers_classe = creer_tableau_sommet_vers_classe(part, adj.taille);
+
+
+    for (int i = 0; i < adj.taille; i++) {
+        int Ci = sommet_vers_classe[i];
+
+
+        cell *tmp = adj.tab[i].head;
+        while (tmp != NULL) {
+            int j = tmp->sommet_arrivee;
+            int Cj = sommet_vers_classe[j];
+
+
+            if (Ci != Cj) {
+                ajouter_lien(liens, Ci, Cj);
+            }
+
+            tmp = tmp->next;
+        }
+    }
+
+    free(sommet_vers_classe);
+    return liens;
+}
+
+
+
+int export_hasse_to_mermaid(t_partition *part, t_liens_array *liens, const char *filename) {
+    FILE *f = fopen(filename, "w");
+    if (!f) {
+        perror("opening hasse file");
+        return 0;
+    }
+
+    fprintf(f, "---\n");
+    fprintf(f, "config:\n");
+    fprintf(f, "  layout: elk\n");
+    fprintf(f, "  theme: neo\n");
+    fprintf(f, "  look: neo\n");
+    fprintf(f, "---\n");
+    fprintf(f, "flowchart TD\n");
+
+
+    for (int i = 0; i < part->nb_classes; i++) {
+        fprintf(f, "%s[\"{", part->classes[i].nom);
+        for (int j = 0; j < part->classes[i].nb_sommets; j++) {
+            fprintf(f, "%d", part->classes[i].sommets[j].identifiant + 1);
+            if (j < part->classes[i].nb_sommets - 1) {
+                fprintf(f, ",");
+            }
+        }
+        fprintf(f, "}\"]\n");
+    }
+    fprintf(f, "\n");
+
+
+    for (int i = 0; i < liens->nb_liens; i++) {
+        fprintf(f, "%s --> %s\n",
+                part->classes[liens->liens[i].classe_depart].nom,
+                part->classes[liens->liens[i].classe_arrivee].nom);
+    }
+
+    fclose(f);
+    return 1;
+}
+
+void liberer_liens_array(t_liens_array *array) {
+    free(array->liens);
+    free(array);
+}
+
+
+int analyser_caracteristiques(t_partition *part, t_liens_array *liens) {
+    if (!part) return 0;
+    int nb_classes = part->nb_classes;
+
+    if (nb_classes == 0) {
+        printf("Aucune classe trouvée.\n");
+        return 0;
+    }
+
+
+    int *a_sortie = (int*)calloc(nb_classes, sizeof(int));
+    if (!a_sortie) { perror("calloc"); return 0; }
+
+    if (liens) {
+        for (int i = 0; i < liens->nb_liens; ++i) {
+            int d = liens->liens[i].classe_depart;
+            int a = liens->liens[i].classe_arrivee;
+            if (d >= 0 && d < nb_classes && a >= 0 && a < nb_classes) {
+                if (d != a) a_sortie[d] = 1;
+            }
+        }
+    }
+
+    printf("Caractéristiques des classes :\n");
+    for (int c = 0; c < nb_classes; ++c) {
+        const char *type_cl = a_sortie[c] ? "transitoire" : "persistante";
+        printf("Classe %s: %s (nb sommets = %d)\n", part->classes[c].nom, type_cl, part->classes[c].nb_sommets);
+    }
+
+    printf("\nCaractéristiques des états (sommets) :\n");
+    for (int c = 0; c < nb_classes; ++c) {
+        int class_transitoire = a_sortie[c];
+        for (int s = 0; s < part->classes[c].nb_sommets; ++s) {
+            int vid = part->classes[c].sommets[s].identifiant;
+            const char *etat_type;
+            if (class_transitoire) {
+                etat_type = "transitoire";
+            } else {
+                if (part->classes[c].nb_sommets == 1) etat_type = "absorbant";
+                else etat_type = "persistant";
+            }
+            printf("État %d : %s (dans classe %s)\n", vid + 1, etat_type, part->classes[c].nom);
+        }
+    }
+
+    int irreductible = (nb_classes == 1) ? 1 : 0;
+    printf("\nGraphe irréductible ? %s\n", irreductible ? "OUI" : "NON");
+
+    free(a_sortie);
+    return irreductible;
+}
+
