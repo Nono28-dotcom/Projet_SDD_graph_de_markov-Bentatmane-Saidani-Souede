@@ -5,11 +5,12 @@
 #include "utils.h"
 #include "markov.h"
 #include "hasse.h"
+#include "matrix.h"
 
 int main(void) {
     char fichier[256];
     printf("Choisissez parmi cette liste un fichier graphe et copiez-collez son nom :\n");
-    printf("../Data/exemple1.txt\n../Data/exemple1_chatGPT_fixed.txt\n../Data/exemple2.txt\n../Data/exemple3.txt\n../Data/exemple4_2check.txt\n../Data/exemple_hasse1.txt\n../Data/exemple_scc1.txt\n../Data/exemple_valid_step3.txt\n");
+    printf("../Data/exemple1.txt\n../Data/exemple1_chatGPT_fixed.txt\n../Data/exemple2.txt\n../Data/exemple3.txt\n../Data/exemple4_2check.txt\n../Data/exemple_hasse1.txt\n../Data/exemple_meteo.txt\n../Data/exemple_scc1.txt\n../Data/exemple_valid_step3.txt\n");
     printf("Nom du fichier :\n");
     if (fgets(fichier, sizeof(fichier), stdin) == NULL) {
         fprintf(stderr, "Lecture du nom de fichier impossible.\n");
@@ -57,6 +58,59 @@ int main(void) {
 
     liberer_liens_array(liens);
     liberer_partition(partition);
+
+
+
+
+
+
+    int n = g.taille;
+    float epsilon = 0.01f;
+
+
+    t_matrix M = createMatrixFromAdjacency(g);
+
+    printf("\nMatrice M :\n");
+    afficherMatrix(M);
+
+
+    t_matrix Mk  = createEmptyMatrix(n);
+    t_matrix Mk1 = createEmptyMatrix(n);
+
+    copyMatrix(Mk, M);
+
+    int k = 1;
+
+    while (1) {
+        multiplyMatrices(Mk, M, Mk1);
+
+        float d = diffMatrices(Mk, Mk1);
+
+        float d2 = ((int)(d * 100 + 0.5)) / 100.0f;
+        printf("\nDifférence M^%d -> M^%d = %.4f (arrondi = %.2f)\n", k, k+1, d, d2);
+
+        if (d2 <= epsilon) {
+            printf("Convergence atteinte : diff < %.2f\n", epsilon);
+            break;
+        }
+
+        copyMatrix(Mk, Mk1);
+        k++;
+
+        if (k > 30) {
+            printf("ATTENTION : pas de convergence après 30 puissances.\n");
+            break;
+        }
+    }
+
+    printf("\n===== MATRICE FINALE (M^%d) =====\n", k);
+    afficherMatrix(Mk);
+
+    freeMatrix(M);
+    freeMatrix(Mk);
+    freeMatrix(Mk1);
+
+
 
     return 0;
 }

@@ -4,7 +4,8 @@
 
 #ifndef MATRIX_H
 #define MATRIX_H
-
+#include "markov.h"
+#include <math.h>
 
 typedef struct {
     int rows;
@@ -22,5 +23,7 @@ t_matrix createMatrixFromAdjacency(liste_adjacence adj);
 void multiplyMatrices(t_matrix A, t_matrix B, t_matrix result);
 
 float diffMatrices(t_matrix A, t_matrix B);
+
+void afficherMatrix(t_matrix m);
 
 #endif //MATRIX_H

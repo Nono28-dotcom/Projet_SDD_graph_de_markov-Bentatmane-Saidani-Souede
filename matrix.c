@@ -3,7 +3,8 @@
 //
 
 #include "matrix.h"
-
+#include "markov.h"
+#include <math.h>
 
 //La fonction createEmptyMatrix permet de créeer une matrice pour contenir les resultats de la liste d'adjacence
 //en d'autres termes, elle permet de créer la matrice probabilité d'un graph
@@ -36,7 +37,7 @@ t_matrix createMatrixFromAdjacency(liste_adjacence adj) {
         //parcours la liste d'adjacence sous liste par sous liste
 
         while (tmp != NULL) {
-            int j = tmp->sommet_arrivee - 1;
+            int j = tmp->sommet_arrivee ;
             M.data[i][j] = tmp->proba;
             tmp = tmp->next;
         }
@@ -94,13 +95,27 @@ void freeMatrix(t_matrix M) {
 }
 
 
+//La fonction permet de calculer la différence entre deux matrices en sommant la valeur absolue de la différence des deux matrices
+
 float diffMatrices(t_matrix A, t_matrix B) {
     float diff = 0.0f;
 
     for (int i = 0; i < A.rows; i++) {
         for (int j = 0; j < A.cols; j++) {
             diff += fabsf(A.data[i][j] - B.data[i][j]);
+            //parcours les deux matrices et incrémente le compteur de différence
+            //fabsf calcule la valeur absolue d'un float pris en argument
         }
     }
     return diff;
+}
+
+
+void afficherMatrix(t_matrix M) {
+    for (int i = 0; i < M.rows; i++) {
+        for (int j = 0; j < M.cols; j++) {
+            printf("%.2f ", M.data[i][j]);
+        }
+        printf("\n");
+    }
 }

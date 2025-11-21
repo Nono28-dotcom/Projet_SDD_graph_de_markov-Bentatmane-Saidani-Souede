@@ -11,4 +11,5 @@ add_executable(main
         hasse.c
         markov.h
         utils.h
-        hasse.h)
+        hasse.h
+        matrix.c)
