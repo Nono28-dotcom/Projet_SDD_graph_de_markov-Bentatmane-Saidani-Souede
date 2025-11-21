@@ -31,10 +31,16 @@ int main(void) {
 
     if (export_to_mermaid(&g, mermaid_file)) {
         printf("Fichier Mermaid généré : %s\n", mermaid_file);
-        printf("Met son contenu dans https://www.mermaidchart.com/\n");
+        printf("Met son contenu dans https://www.mermaidchart.com/ et le graphe associé sera généré\n");
     } else {
         fprintf(stderr, "Erreur lors de la génération du fichier Mermaid.\n");
     }
+
+    printf("\nAlgorithme de Tarjan :\n");
+    t_partition *partition = tarjan(g);
+    afficher_partition(partition);
+    liberer_partition(partition);
+
 
     return 0;
 }

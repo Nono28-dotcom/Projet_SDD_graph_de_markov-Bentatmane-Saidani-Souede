@@ -107,7 +107,7 @@ liste_adjacence readGraph (const char* filename) {
   liste_adjacence adj = creer_liste_adjacence_vide(nbvert);
   //crée le tableau d'adjacence vide
   while (fscanf(file, "%d %d %f", &depart, &arrivee, &proba) == 3){
-    ajouter_cellule(&adj.tab[depart - 1], arrivee, proba);
+    ajouter_cellule(&adj.tab[depart - 1], arrivee - 1, proba);
   }
   //parcours du fichier et insertion dans la liste
   fclose(file);
@@ -180,14 +180,190 @@ int export_to_mermaid(const liste_adjacence *adj, const char *filename) {
 
   for (int i = 0; i < adj->taille; ++i) {
     cell *tmp = adj->tab[i].head;
-    char *id_from = getID(i + 1);
     while (tmp != NULL) {
-      char *id_to = getID(tmp->sommet_arrivee);
-      fprintf(f, "%s -->|%.2f|%s\n", id_from, tmp->proba, id_to);
+        fprintf(f, "%s -->|%.2f|%s\n", getID(i + 1), tmp->proba, getID(tmp->sommet_arrivee + 1));
       tmp = tmp->next;
     }
   }
   // parcours la liste d'adjacence et écrit dans le fichier la valeur des arrêtes
   fclose(f);
   return 1;
+}
+
+
+t_pile* creer_pile(int capacite) {
+    t_pile *p = (t_pile*)malloc(sizeof(t_pile));
+    p->elements = (int*)malloc(capacite * sizeof(int));
+    p->sommet = -1;
+    p->capacite = capacite;
+    return p;
+}
+
+int pile_vide(t_pile *p) {
+    return p->sommet == -1;
+}
+
+void empiler(t_pile *p, int valeur) {
+    if (p->sommet < p->capacite - 1) {
+        p->sommet++;
+        p->elements[p->sommet] = valeur;
+    }
+}
+
+int depiler(t_pile *p) {
+    if (!pile_vide(p)) {
+        int val = p->elements[p->sommet];
+        p->sommet--;
+        return val;
+    }
+    return -1;
+}
+
+void liberer_pile(t_pile *p) {
+    free(p->elements);
+    free(p);
+}
+
+
+
+t_partition* creer_partition() {
+    t_partition *part = (t_partition*)malloc(sizeof(t_partition));
+    part->classes = NULL;
+    part->nb_classes = 0;
+    part->capacite = 0;
+    return part;
+}
+
+void ajouter_classe(t_partition *part) {
+    if (part->nb_classes >= part->capacite) {
+        part->capacite = (part->capacite == 0) ? 2 : part->capacite * 2;
+        part->classes = (t_classe*)realloc(part->classes, part->capacite * sizeof(t_classe));
+    }
+
+    t_classe *c = &part->classes[part->nb_classes];
+    sprintf(c->nom, "C%d", part->nb_classes + 1);
+    c->sommets = NULL;
+    c->nb_sommets = 0;
+    c->capacite = 0;
+    part->nb_classes++;
+}
+
+void ajouter_sommet_classe(t_classe *classe, t_tarjan_vertex sommet) {
+    if (classe->nb_sommets >= classe->capacite) {
+        classe->capacite = (classe->capacite == 0) ? 2 : classe->capacite * 2;
+        classe->sommets = (t_tarjan_vertex*)realloc(classe->sommets,
+                                                     classe->capacite * sizeof(t_tarjan_vertex));
+    }
+    classe->sommets[classe->nb_sommets] = sommet;
+    classe->nb_sommets++;
+}
+
+void afficher_partition(t_partition *part) {
+    for (int i = 0; i < part->nb_classes; i++) {
+        printf("Composante %s: {", part->classes[i].nom);
+        for (int j = 0; j < part->classes[i].nb_sommets; j++) {
+            printf("%d", part->classes[i].sommets[j].identifiant + 1);  // +1 ICI
+            if (j < part->classes[i].nb_sommets - 1) {
+                printf(",");
+            }
+        }
+        printf("}\n");
+    }
+}
+
+void liberer_partition(t_partition *part) {
+    for (int i = 0; i < part->nb_classes; i++) {
+        free(part->classes[i].sommets);
+    }
+    free(part->classes);
+    free(part);
+}
+
+
+t_tarjan_vertex* initialiser_tarjan_vertices(liste_adjacence adj) {
+    t_tarjan_vertex *vertices = (t_tarjan_vertex*)malloc(adj.taille * sizeof(t_tarjan_vertex));
+
+    for (int i = 0; i < adj.taille; i++) {
+        vertices[i].identifiant = i;
+        vertices[i].numero = -1;
+        vertices[i].numero_accessible = -1;
+        vertices[i].dans_pile = 0;
+    }
+
+    return vertices;
+}
+
+
+
+int min(int a, int b) {
+    return (a < b) ? a : b;
+}
+
+void parcours(int sommet_id, liste_adjacence adj, t_tarjan_vertex *vertices,
+              t_pile *pile, t_partition *part, int *compteur) {
+
+    vertices[sommet_id].numero = *compteur;
+    vertices[sommet_id].numero_accessible = *compteur;
+    (*compteur)++;
+
+
+    empiler(pile, sommet_id);
+    vertices[sommet_id].dans_pile = 1;
+
+
+    cell *tmp = adj.tab[sommet_id].head;
+    while (tmp != NULL) {
+        int succ_id = tmp->sommet_arrivee;
+
+        if (vertices[succ_id].numero == -1) {
+            parcours(succ_id, adj, vertices, pile, part, compteur);
+            vertices[sommet_id].numero_accessible =
+                min(vertices[sommet_id].numero_accessible,
+                    vertices[succ_id].numero_accessible);
+        }
+        else if (vertices[succ_id].dans_pile == 1) {
+            vertices[sommet_id].numero_accessible =
+                min(vertices[sommet_id].numero_accessible,
+                    vertices[succ_id].numero);
+        }
+
+        tmp = tmp->next;
+    }
+
+
+    if (vertices[sommet_id].numero_accessible == vertices[sommet_id].numero) {
+        ajouter_classe(part);
+        t_classe *classe_courante = &part->classes[part->nb_classes - 1];
+
+        int w;
+        do {
+            w = depiler(pile);
+            vertices[w].dans_pile = 0;
+            ajouter_sommet_classe(classe_courante, vertices[w]);
+        } while (w != sommet_id);
+    }
+}
+
+
+
+t_partition* tarjan(liste_adjacence adj) {
+
+    t_partition *part = creer_partition();
+
+    t_tarjan_vertex *vertices = initialiser_tarjan_vertices(adj);
+
+    t_pile *pile = creer_pile(adj.taille);
+
+    int compteur = 0;
+
+    for (int i = 0; i < adj.taille; i++) {
+        if (vertices[i].numero == -1) {
+            parcours(i, adj, vertices, pile, part, &compteur);
+        }
+    }
+
+    liberer_pile(pile);
+    free(vertices);
+
+    return part;
 }
