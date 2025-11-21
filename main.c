@@ -66,50 +66,58 @@ int main(void) {
 
     int n = g.taille;
     float epsilon = 0.01f;
+    //on initialise la taille de la matrice (nombres d'états) et epsilon (critère d'arrêt lorsque la différence entre M^k et M^(k+1) < 0.01)
 
 
     t_matrix M = createMatrixFromAdjacency(g);
-
     printf("\nMatrice M :\n");
     afficherMatrix(M);
+    //Convertit la liste d'adjacence du graph en matrice de probabilité
 
 
     t_matrix Mk  = createEmptyMatrix(n);
     t_matrix Mk1 = createEmptyMatrix(n);
+    //Mk va contenir les matrice avec différents exposants k et Mk1 stock M^(k+1) temporairement
 
     copyMatrix(Mk, M);
-
     int k = 1;
+    //On initialise (M^1=M)
 
     while (1) {
         multiplyMatrices(Mk, M, Mk1);
+        //on effectue le produit matriciel et on stock le résultat dans Mk1
 
         float d = diffMatrices(Mk, Mk1);
+        //on calcule la différence entre M^k et M^(k+1)
 
         float d2 = ((int)(d * 100 + 0.5)) / 100.0f;
+        //on arrondi le critère d'arrêt pour que la matrice stationaire renvoyée a la fin soit la même dans que dans les consignes
         printf("\nDifférence M^%d -> M^%d = %.4f (arrondi = %.2f)\n", k, k+1, d, d2);
+        //affiche la différence entre M^k et M^(k+1)
 
         if (d2 <= epsilon) {
             printf("Convergence atteinte : diff < %.2f\n", epsilon);
             break;
         }
+        //verifie le critère d'arrêt et sort de la boucle si il est respecté (la différence est inferieure à epsilon)
 
         copyMatrix(Mk, Mk1);
         k++;
+        //on incrémente et on continue la boucle jusqu'a en sortir
 
         if (k > 30) {
-            printf("ATTENTION : pas de convergence après 30 puissances.\n");
+            printf("Pas de convergence\n");
             break;
         }
+        //si la boucle parcours trop d'itération, on sort de cette dernière
     }
 
-    printf("\n===== MATRICE FINALE (M^%d) =====\n", k);
+    printf("\Matrice finale (M^%d)", k);
     afficherMatrix(Mk);
-
     freeMatrix(M);
     freeMatrix(Mk);
     freeMatrix(Mk1);
-
+    //affiche la matrice finale, et libère les 3 matrices pour lesquelles on a alloué de l'espace
 
 
     return 0;

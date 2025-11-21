@@ -110,11 +110,13 @@ float diffMatrices(t_matrix A, t_matrix B) {
     return diff;
 }
 
+//La fonction afficherMatrix permet un affichage de la matrice dans le terminal
 
 void afficherMatrix(t_matrix M) {
     for (int i = 0; i < M.rows; i++) {
         for (int j = 0; j < M.cols; j++) {
             printf("%.2f ", M.data[i][j]);
+            //Parcours la structure matrice et affiche chaque élément de cette derniere
         }
         printf("\n");
     }
