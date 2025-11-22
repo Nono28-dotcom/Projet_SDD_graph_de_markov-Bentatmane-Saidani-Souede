@@ -178,7 +178,7 @@ t_matrix powerUntilLimit(t_matrix S, float eps, int max_iter) {
 void printStationaryForAllClasses(liste_adjacence g, t_partition *part) {
     t_matrix M = createMatrixFromAdjacency(g);
 
-    printf("\n===== ÉTAPE 2 : Distributions stationnaires par classe =====\n");
+    printf("\nDistributions stationnaires par classe\n");
 
     for (int c = 0; c < part->nb_classes; c++) {
 
