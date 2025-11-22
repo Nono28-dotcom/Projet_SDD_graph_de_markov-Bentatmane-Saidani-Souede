@@ -121,3 +121,36 @@ void afficherMatrix(t_matrix M) {
         printf("\n");
     }
 }
+
+
+
+t_matrix subMatrix(t_matrix M, t_partition part, int compo_index) {
+
+    // Nombre de sommets dans cette composante
+    int new_n = part->sizes[compo_index];
+
+    // Création de la sous-matrice carrée (new_n × new_n)
+    t_matrix S = createEmptyMatrix(new_n);
+
+    // Liste des indices réels des sommets de cette composante
+    int *indices = part->components[compo_index];
+
+    /*
+        indices = tableau des sommets appartenant à cette classe
+        Exemple : indices = {2, 5, 6}
+        Cela veut dire que la composante contient les sommets 2, 5 et 6.
+    */
+
+    // Remplissage de la sous-matrice :
+    for (int i = 0; i < new_n; i++) {
+        int orig_row = indices[i] - 1;   // passage sommet -> index
+
+        for (int j = 0; j < new_n; j++) {
+            int orig_col = indices[j] - 1;
+
+            S.data[i][j] = M.data[orig_row][orig_col];
+        }
+    }
+
+    return S;
+}

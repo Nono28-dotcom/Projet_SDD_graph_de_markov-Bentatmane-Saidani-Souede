@@ -26,4 +26,6 @@ float diffMatrices(t_matrix A, t_matrix B);
 
 void afficherMatrix(t_matrix m);
 
+t_matrix subMatrix(t_matrix matrix, t_partition part, int compo_index);
+
 #endif //MATRIX_H
