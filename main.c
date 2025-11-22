@@ -56,8 +56,8 @@ int main(void) {
 
     analyser_caracteristiques(partition, liens);
 
-    liberer_liens_array(liens);
-    liberer_partition(partition);
+
+
 
 
 
@@ -112,7 +112,7 @@ int main(void) {
         //si la boucle parcours trop d'itération, on sort de cette dernière
     }
 
-    printf("\Matrice finale (M^%d)", k);
+    printf("\nMatrice finale (M^%d)\n", k);
     afficherMatrix(Mk);
     freeMatrix(M);
     freeMatrix(Mk);
@@ -120,5 +120,12 @@ int main(void) {
     //affiche la matrice finale, et libère les 3 matrices pour lesquelles on a alloué de l'espace
 
 
+    printStationaryForAllClasses(g, partition);
+
+    liberer_liens_array(liens);
+    liberer_partition(partition);
+
     return 0;
 }
+
+

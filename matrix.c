@@ -123,34 +123,94 @@ void afficherMatrix(t_matrix M) {
 }
 
 
+t_matrix subMatrix(t_matrix M, t_partition *part, int c) {
+    int k = part->classes[c].nb_sommets;
 
-t_matrix subMatrix(t_matrix M, t_partition part, int compo_index) {
+    t_matrix S = createEmptyMatrix(k);
+    int *indices = malloc(k * sizeof(int));
 
-    // Nombre de sommets dans cette composante
-    int new_n = part->sizes[compo_index];
+    for (int i = 0; i < k; i++) {
+        indices[i] = part->classes[c].sommets[i].numero;
 
-    // Création de la sous-matrice carrée (new_n × new_n)
-    t_matrix S = createEmptyMatrix(new_n);
-
-    // Liste des indices réels des sommets de cette composante
-    int *indices = part->components[compo_index];
-
-    /*
-        indices = tableau des sommets appartenant à cette classe
-        Exemple : indices = {2, 5, 6}
-        Cela veut dire que la composante contient les sommets 2, 5 et 6.
-    */
-
-    // Remplissage de la sous-matrice :
-    for (int i = 0; i < new_n; i++) {
-        int orig_row = indices[i] - 1;   // passage sommet -> index
-
-        for (int j = 0; j < new_n; j++) {
-            int orig_col = indices[j] - 1;
-
-            S.data[i][j] = M.data[orig_row][orig_col];
+        if (indices[i] < 0 || indices[i] >= M.rows) {
+            printf("ERREUR: sommet %d invalide dans classe %d\n",
+                   part->classes[c].sommets[i].numero, c);
+            exit(EXIT_FAILURE);
         }
     }
 
+    for (int i = 0; i < k; i++)
+        for (int j = 0; j < k; j++)
+            S.data[i][j] = M.data[ indices[i] ][ indices[j] ];
+
+    free(indices);
     return S;
+}
+
+
+t_matrix powerUntilLimit(t_matrix S, float eps, int max_iter) {
+    int n = S.rows;
+
+    t_matrix Mk  = createEmptyMatrix(n);
+    t_matrix Mk1 = createEmptyMatrix(n);
+
+    copyMatrix(Mk, S);
+
+    for (int k = 1; k <= max_iter; k++) {
+        multiplyMatrices(Mk, S, Mk1);
+
+        float d = diffMatrices(Mk, Mk1);
+        float d2 = ((int)(d * 100 + 0.5)) / 100.0f;
+
+        if (d2 < eps) {
+            freeMatrix(Mk);
+            return Mk1;
+        }
+
+        copyMatrix(Mk, Mk1);
+    }
+
+    return Mk1;
+}
+
+
+void printStationaryForAllClasses(liste_adjacence g, t_partition *part) {
+    t_matrix M = createMatrixFromAdjacency(g);
+
+    printf("\n===== ÉTAPE 2 : Distributions stationnaires par classe =====\n");
+
+    for (int c = 0; c < part->nb_classes; c++) {
+
+        printf("\nClasse %d (taille %d)\n",
+               c, part->classes[c].nb_sommets);
+
+        t_matrix S = subMatrix(M, part, c);
+
+        printf("\nSous-matrice S :\n \n");
+        afficherMatrix(S);
+
+        t_matrix L = powerUntilLimit(S, 0.01f, 50);
+
+        printf("\nMatrice limite S exposant oo :\n \n");
+        afficherMatrix(L);
+
+        int k = L.rows;
+        float somme = 0;
+        for (int j = 0; j < k; j++)
+            somme += L.data[0][j];
+
+        printf("\nDistribution stationnaire : [");
+        if (somme < 1e-6) {
+            for (int j = 0; j < k; j++) printf("0 ");
+        } else {
+            for (int j = 0; j < k; j++)
+                printf("%.3f ", L.data[0][j] / somme);
+        }
+        printf("]\n");
+
+        freeMatrix(S);
+        freeMatrix(L);
+    }
+
+    freeMatrix(M);
 }

@@ -5,6 +5,6 @@
 -- Check for working C compiler: C:/Users/nsoue/AppData/Local/JetBrains/CLion 2024.3.4/bin/mingw/bin/gcc.exe - skipped
 -- Detecting C compile features
 -- Detecting C compile features - done
--- Configuring done (3.7s)
+-- Configuring done (8.0s)
 -- Generating done (0.1s)
 -- Build files have been written to: C:/Users/nsoue/CLionProjects/Projet_SDD_graph_de_markov-Bentatmane-Saidani-Souede/cmake-build-debug
