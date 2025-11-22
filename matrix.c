@@ -129,8 +129,9 @@ t_matrix subMatrix(t_matrix M, t_partition *part, int c) {
     t_matrix S = createEmptyMatrix(k);
     int *indices = malloc(k * sizeof(int));
 
+    // Récupération CORRECTE : utiliser .numero et non .identifiant
     for (int i = 0; i < k; i++) {
-        indices[i] = part->classes[c].sommets[i].numero;
+        indices[i] = part->classes[c].sommets[i].identifiant;
 
         if (indices[i] < 0 || indices[i] >= M.rows) {
             printf("ERREUR: sommet %d invalide dans classe %d\n",
