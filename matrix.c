@@ -157,6 +157,7 @@ t_matrix subMatrix(t_matrix M, t_partition *part, int c) {
 
 //La fonction powerUntilLimit permet de calculer les puissances de la matrice jusqu'a qu'elle ateingne un état stationaire
 //c'est a dire jusqu'a qu'elle soit stable
+//elle prends en entré la sous matrice S, epsilon pour le critère d'arrêt et le nombre d'itération maximum
 
 t_matrix powerUntilLimit(t_matrix S, float eps, int max_iter) {
     int n = S.rows;
@@ -190,46 +191,59 @@ t_matrix powerUntilLimit(t_matrix S, float eps, int max_iter) {
     }
 
     return Mk1;
+    //retourne la dernière matrice a son état stationaire
 }
 
+// cette fonction printStationaryForAllClasses regroupe tout le processus demandé dans l'étape 2 de la partie 3
+//à savoir l'extraction de la sous matrice des classes definies grâce a tarjan et le calcul de leur état stationnaire et de la distribution stationnaire
+//Elle prends en entré la liste d'adjacence et la partition de tarjan
 
 void printStationaryForAllClasses(liste_adjacence g, t_partition *part) {
     t_matrix M = createMatrixFromAdjacency(g);
+    //On convertis le graph en matrice M
+
 
     printf("\nDistributions stationnaires par classe\n");
 
     for (int c = 0; c < part->nb_classes; c++) {
+        //boucle sur chaque classe
 
         printf("\nClasse %d (taille %d)\n",
                c, part->classes[c].nb_sommets);
 
         t_matrix S = subMatrix(M, part, c);
-
         printf("\nSous-matrice S :\n \n");
         afficherMatrix(S);
+        //on crée et affiche les sous matrices associés au classes
 
         t_matrix L = powerUntilLimit(S, 0.01f, 50);
-
         printf("\nMatrice limite S exposant oo :\n \n");
         afficherMatrix(L);
+        //on utilise la foncion powerUntilLimit pour calculer l'état stationaires de ces denières puis on l'affiche
 
         int k = L.rows;
         float somme = 0;
         for (int j = 0; j < k; j++)
             somme += L.data[0][j];
+        //on somme la première ligne (on aurait pu sommer une autre ligne car toutes les lignes sont égales lorsque la matrice est stationaire)
 
         printf("\nDistribution stationnaire : [");
         if (somme < 1e-6) {
             for (int j = 0; j < k; j++) printf("0 ");
+            //on verifie si la somme est proche de zéro même si elle est censé valloir 1, pour eviter une division par zéro et un bug
         } else {
             for (int j = 0; j < k; j++)
                 printf("%.3f ", L.data[0][j] / somme);
+                //comme la somme est censé valloir 1, on affiche la distribution stationnaire de la matrice sur un seul vecteur probabilité
         }
         printf("]\n");
 
+
         freeMatrix(S);
         freeMatrix(L);
+        //on libère l'espace alloué pour la sous matrice et la sous matrice stationnaire
     }
 
     freeMatrix(M);
+    //on libère l'espace de la matrice M
 }
