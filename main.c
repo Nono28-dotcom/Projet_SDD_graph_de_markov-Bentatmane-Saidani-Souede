@@ -8,6 +8,8 @@
 #include "matrix.h"
 
 int main(void) {
+
+    // Chargement du fichier______________________________________________________________________________
     char fichier[256];
     printf("Choisissez parmi cette liste un fichier graphe et copiez-collez son nom :\n");
     printf("../Data/exemple1.txt\n../Data/exemple1_chatGPT_fixed.txt\n../Data/exemple2.txt\n../Data/exemple3.txt\n../Data/exemple4_2check.txt\n../Data/exemple_hasse1.txt\n../Data/exemple_meteo.txt\n../Data/exemple_scc1.txt\n../Data/exemple_valid_step3.txt\n");
@@ -27,9 +29,13 @@ int main(void) {
     const char *input = fichier;
     const char *mermaid_file = "../sortie_effectuee.txt";
 
+    //verification graph de markov____________________________________________________________________
+
     liste_adjacence g = readGraph(input);
 
     verif_graphe_Markov(g);
+
+    //exporter au format mermaid__________________________________________________________________________
 
     if (export_to_mermaid(&g, mermaid_file)) {
         printf("Fichier Mermaid généré : %s\n", mermaid_file);
@@ -38,9 +44,13 @@ int main(void) {
         fprintf(stderr, "Erreur lors de la génération du fichier Mermaid.\n");
     }
 
+    //Algorithme de Tarjan__________________________________________________________________________________
+
     printf("\nAlgorithme de Tarjan :\n");
     t_partition *partition = tarjan(g);
     afficher_partition(partition);
+
+    //Diagrame de Hasse____________________________________________________________________________________
 
     printf("\nDiagramme de Hasse :\n");
     t_liens_array *liens = construire_hasse(g, partition);
@@ -56,13 +66,7 @@ int main(void) {
 
     analyser_caracteristiques(partition, liens);
 
-
-
-
-
-
-
-
+    //Calcul de la matrice stationaire________________________________________________________________________
 
     int n = g.taille;
     float epsilon = 0.01f;
@@ -119,6 +123,7 @@ int main(void) {
     freeMatrix(Mk1);
     //affiche la matrice finale, et libère les 3 matrices pour lesquelles on a alloué de l'espace
 
+    //Distribution stationaire par classes___________________________________________________________________________
 
     printStationaryForAllClasses(g, partition);
 
