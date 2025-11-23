@@ -122,14 +122,17 @@ void afficherMatrix(t_matrix M) {
     }
 }
 
+//La fonction subMatrix sert a extraire les sous matrices des classes en prenant en entré la matrice, la partition de tarjan et l'indice de la classe à extraire
 
 t_matrix subMatrix(t_matrix M, t_partition *part, int c) {
     int k = part->classes[c].nb_sommets;
+    //initialise la taille de la sous matrice, c'est a dire le nombre de sommets de la classe
 
     t_matrix S = createEmptyMatrix(k);
     int *indices = malloc(k * sizeof(int));
+    //on crée une matrice vide de dimension k*k et un tableau indice qui servira à contenir tout les indices de cette sous matricre dans la matrice M originale
 
-    // Récupération CORRECTE : utiliser .numero et non .identifiant
+
     for (int i = 0; i < k; i++) {
         indices[i] = part->classes[c].sommets[i].identifiant;
 
@@ -139,36 +142,51 @@ t_matrix subMatrix(t_matrix M, t_partition *part, int c) {
             exit(EXIT_FAILURE);
         }
     }
+    //on rempli indices avec les identifiants des sommets dont on a besoin
+    //on implémente également un crash contrôlé au cas ou le programe sort des bornes
 
     for (int i = 0; i < k; i++)
         for (int j = 0; j < k; j++)
             S.data[i][j] = M.data[ indices[i] ][ indices[j] ];
+    //on copie la partie de M dont on a besoin dans S, grâce au tableau indice
 
     free(indices);
     return S;
+    //on libère le tableau de stockage temporaire et on renvoie la sous matrice
 }
 
+//La fonction powerUntilLimit permet de calculer les puissances de la matrice jusqu'a qu'elle ateingne un état stationaire
+//c'est a dire jusqu'a qu'elle soit stable
 
 t_matrix powerUntilLimit(t_matrix S, float eps, int max_iter) {
     int n = S.rows;
+    //on récupère la dimention n de la nouvelle sous matrice
 
     t_matrix Mk  = createEmptyMatrix(n);
     t_matrix Mk1 = createEmptyMatrix(n);
+    //on crée les matrice S^k(Mk) et S^(k+1)(Mk1)
 
     copyMatrix(Mk, S);
+    //on initialse M^1=S
 
     for (int k = 1; k <= max_iter; k++) {
         multiplyMatrices(Mk, S, Mk1);
+        //on multiple les matrices pour chaque itération de boucle
 
         float d = diffMatrices(Mk, Mk1);
         float d2 = ((int)(d * 100 + 0.5)) / 100.0f;
+        //on calcule la difference entre les deux matrices puis on arrondi le critère d'arrêt
 
         if (d2 < eps) {
             freeMatrix(Mk);
             return Mk1;
         }
+        //on verifie si le critère d'arrêt deviens inferieur a epsilon, et on arrête le programme si c'est le cas en renvoyant la matrice stationaire
+
+
 
         copyMatrix(Mk, Mk1);
+        //on prépare l'itération suivante
     }
 
     return Mk1;
