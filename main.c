@@ -9,11 +9,11 @@
 
 int main(void) {
 
-    // Chargement du fichier______________________________________________________________________________
     char fichier[256];
+    printf("    PROGRAMME D'ANALYSE DE GRAPHES DE MARKOV    \n\n");
     printf("Choisissez parmi cette liste un fichier graphe et copiez-collez son nom :\n");
     printf("../Data/exemple1.txt\n../Data/exemple1_chatGPT_fixed.txt\n../Data/exemple2.txt\n../Data/exemple3.txt\n../Data/exemple4_2check.txt\n../Data/exemple_hasse1.txt\n../Data/exemple_meteo.txt\n../Data/exemple_scc1.txt\n../Data/exemple_valid_step3.txt\n");
-    printf("Nom du fichier :\n");
+    printf("Nom du fichier : ");
     if (fgets(fichier, sizeof(fichier), stdin) == NULL) {
         fprintf(stderr, "Lecture du nom de fichier impossible.\n");
         return 1;
@@ -27,108 +27,266 @@ int main(void) {
     }
 
     const char *input = fichier;
-    const char *mermaid_file = "../sortie_effectuee.txt";
 
-    //verification graph de markov____________________________________________________________________
 
     liste_adjacence g = readGraph(input);
-
-    verif_graphe_Markov(g);
-
-    //exporter au format mermaid__________________________________________________________________________
-
-    if (export_to_mermaid(&g, mermaid_file)) {
-        printf("Fichier Mermaid généré : %s\n", mermaid_file);
-        printf("Met son contenu dans https://www.mermaidchart.com/ et le graphe associé sera généré\n");
-    } else {
-        fprintf(stderr, "Erreur lors de la génération du fichier Mermaid.\n");
-    }
-
-    //Algorithme de Tarjan__________________________________________________________________________________
-
-    printf("\nAlgorithme de Tarjan :\n");
-    t_partition *partition = tarjan(g);
-    afficher_partition(partition);
-
-    //Diagrame de Hasse____________________________________________________________________________________
-
-    printf("\nDiagramme de Hasse :\n");
-    t_liens_array *liens = construire_hasse(g, partition);
-    printf("Nombre de liens entre classes (avec redondances) : %d\n", liens->nb_liens);
+    printf("\nGraphe chargé avec succès (%d sommets).\n", g.taille);
 
 
-    removeTransitiveLinks(liens);
-    printf("Nombre de liens entre classes (sans redondances) : %d\n", liens->nb_liens);
+    int choix;
+    int continuer = 1;
+    t_partition *partition = NULL;
+    t_liens_array *liens = NULL;
 
-    if (export_hasse_to_mermaid(partition, liens, "../hasse.txt")) {
-        printf("Diagramme de Hasse généré : ../hasse.txt\n");
-    }
+    while (continuer) {
+        printf("\n                                      \n");
+        printf("         MENU PRINCIPAL\n");
+        printf("                                        \n");
+        printf("1. Vérifier si c'est un graphe de Markov\n");
+        printf("2. Exporter le graphe au format Mermaid\n");
+        printf("3. Algorithme de Tarjan (composantes fortement connexes)\n");
+        printf("4. Diagramme de Hasse\n");
+        printf("5. Analyser les caractéristiques du graphe\n");
+        printf("6. Calculer la matrice stationnaire\n");
+        printf("7. Distribution stationnaire par classes\n");
+        printf("8. Tout exécuter\n");
+        printf("0. Quitter\n");
+        printf("                                        \n");
+        printf("Votre choix : ");
 
-    analyser_caracteristiques(partition, liens);
+        if (scanf("%d", &choix) != 1) {
 
-    //Calcul de la matrice stationaire________________________________________________________________________
-
-    int n = g.taille;
-    float epsilon = 0.01f;
-    //on initialise la taille de la matrice (nombres d'états) et epsilon (critère d'arrêt lorsque la différence entre M^k et M^(k+1) < 0.01)
-
-
-    t_matrix M = createMatrixFromAdjacency(g);
-    printf("\nMatrice M :\n");
-    afficherMatrix(M);
-    //Convertit la liste d'adjacence du graph en matrice de probabilité
-
-
-    t_matrix Mk  = createEmptyMatrix(n);
-    t_matrix Mk1 = createEmptyMatrix(n);
-    //Mk va contenir les matrice avec différents exposants k et Mk1 stock M^(k+1) temporairement
-
-    copyMatrix(Mk, M);
-    int k = 1;
-    //On initialise (M^1=M)
-
-    while (1) {
-        multiplyMatrices(Mk, M, Mk1);
-        //on effectue le produit matriciel et on stock le résultat dans Mk1
-
-        float d = diffMatrices(Mk, Mk1);
-        //on calcule la différence entre M^k et M^(k+1)
-
-        float d2 = ((int)(d * 100 + 0.5)) / 100.0f;
-        //on arrondi le critère d'arrêt pour que la matrice stationaire renvoyée a la fin soit la même dans que dans les consignes
-        printf("\nDifférence M^%d -> M^%d = %.4f (arrondi = %.2f)\n", k, k+1, d, d2);
-        //affiche la différence entre M^k et M^(k+1)
-
-        if (d2 <= epsilon) {
-            printf("Convergence atteinte : diff < %.2f\n", epsilon);
-            break;
+            while (getchar() != '\n');
+            printf("Choix invalide. Veuillez entrer un nombre.\n");
+            continue;
         }
-        //verifie le critère d'arrêt et sort de la boucle si il est respecté (la différence est inferieure à epsilon)
 
-        copyMatrix(Mk, Mk1);
-        k++;
-        //on incrémente et on continue la boucle jusqu'a en sortir
+        printf("\n");
 
-        if (k > 30) {
-            printf("Pas de convergence\n");
-            break;
+        switch (choix) {
+            case 1:
+
+                printf("    VÉRIFICATION GRAPHE DE MARKOV    \n");
+                verif_graphe_Markov(g);
+                break;
+
+            case 2:
+
+                printf("     EXPORT MERMAID     \n");
+                if (export_to_mermaid(&g, "../sortie_effectuee.txt")) {
+                    printf("Fichier Mermaid généré : ../sortie_effectuee.txt\n");
+                    printf("Mettez son contenu dans https://www.mermaidchart.com/\n");
+                } else {
+                    fprintf(stderr, "Erreur lors de la génération du fichier Mermaid.\n");
+                }
+                break;
+
+            case 3:
+
+                printf("    ALGORITHME DE TARJAN    \n");
+                if (partition != NULL) {
+                    printf("Partition déjà calculée :\n");
+                    afficher_partition(partition);
+                } else {
+                    partition = tarjan(g);
+                    afficher_partition(partition);
+                }
+                break;
+
+            case 4:
+
+                printf("    DIAGRAMME DE HASSE    \n");
+                if (partition == NULL) {
+                    printf("Calcul de la partition (Tarjan) nécessaire...\n");
+                    partition = tarjan(g);
+                    afficher_partition(partition);
+                    printf("\n");
+                }
+
+                if (liens != NULL) {
+                    liberer_liens_array(liens);
+                }
+
+                liens = construire_hasse(g, partition);
+                printf("Nombre de liens entre classes (avec redondances) : %d\n", liens->nb_liens);
+
+                removeTransitiveLinks(liens);
+                printf("Nombre de liens entre classes (sans redondances) : %d\n", liens->nb_liens);
+
+                if (export_hasse_to_mermaid(partition, liens, "../hasse.txt")) {
+                    printf("Diagramme de Hasse généré : ../hasse.txt\n");
+                }
+                break;
+
+            case 5:
+
+                printf("    CARACTÉRISTIQUES DU GRAPHE    \n");
+                if (partition == NULL) {
+                    printf("Calcul de la partition (Tarjan) nécessaire...\n");
+                    partition = tarjan(g);
+                    printf("\n");
+                }
+                if (liens == NULL) {
+                    printf("Calcul du diagramme de Hasse nécessaire...\n");
+                    liens = construire_hasse(g, partition);
+                    removeTransitiveLinks(liens);
+                    printf("\n");
+                }
+
+                analyser_caracteristiques(partition, liens);
+                break;
+
+            case 6:
+
+                printf("    MATRICE STATIONNAIRE    \n");
+                {
+                    int n = g.taille;
+                    float epsilon = 0.01f;
+
+                    t_matrix M = createMatrixFromAdjacency(g);
+                    printf("\nMatrice M :\n");
+                    afficherMatrix(M);
+
+                    t_matrix Mk  = createEmptyMatrix(n);
+                    t_matrix Mk1 = createEmptyMatrix(n);
+
+                    copyMatrix(Mk, M);
+                    int k = 1;
+
+                    while (1) {
+                        multiplyMatrices(Mk, M, Mk1);
+                        float d = diffMatrices(Mk, Mk1);
+                        float d2 = ((int)(d * 100 + 0.5)) / 100.0f;
+
+                        printf("\nDifférence M^%d -> M^%d = %.4f (arrondi = %.2f)\n", k, k+1, d, d2);
+
+                        if (d2 <= epsilon) {
+                            printf("Convergence atteinte : diff < %.2f\n", epsilon);
+                            break;
+                        }
+
+                        copyMatrix(Mk, Mk1);
+                        k++;
+
+                        if (k > 30) {
+                            printf("Pas de convergence après 30 itérations.\n");
+                            break;
+                        }
+                    }
+
+                    printf("\nMatrice finale (M^%d)\n", k);
+                    afficherMatrix(Mk);
+
+                    freeMatrix(M);
+                    freeMatrix(Mk);
+                    freeMatrix(Mk1);
+                }
+                break;
+
+            case 7:
+
+                printf("    DISTRIBUTION STATIONNAIRE PAR CLASSES    \n");
+                if (partition == NULL) {
+                    printf("Calcul de la partition (Tarjan) nécessaire...\n");
+                    partition = tarjan(g);
+                    printf("\n");
+                }
+                printStationaryForAllClasses(g, partition);
+                break;
+
+            case 8:
+
+                printf("    EXÉCUTION COMPLÈTE    \n\n");
+
+                printf("1. Vérification graphe de Markov\n");
+                verif_graphe_Markov(g);
+
+                printf("\n2. Export Mermaid\n");
+                if (export_to_mermaid(&g, "../sortie_effectuee.txt")) {
+                    printf("Fichier Mermaid généré : ../sortie_effectuee.txt\n");
+                }
+
+                printf("\n3. Algorithme de Tarjan\n");
+                if (partition != NULL) {
+                    liberer_partition(partition);
+                }
+                partition = tarjan(g);
+                afficher_partition(partition);
+
+                printf("\n4. Diagramme de Hasse\n");
+                if (liens != NULL) {
+                    liberer_liens_array(liens);
+                }
+                liens = construire_hasse(g, partition);
+                printf("Nombre de liens (avec redondances) : %d\n", liens->nb_liens);
+                removeTransitiveLinks(liens);
+                printf("Nombre de liens (sans redondances) : %d\n", liens->nb_liens);
+                export_hasse_to_mermaid(partition, liens, "../hasse.txt");
+                printf("Diagramme de Hasse généré : ../hasse.txt\n");
+
+                printf("\n5. Caractéristiques\n");
+                analyser_caracteristiques(partition, liens);
+
+                printf("\n6. Matrice stationnaire\n");
+                {
+                    int n = g.taille;
+                    float epsilon = 0.01f;
+                    t_matrix M = createMatrixFromAdjacency(g);
+                    printf("\nMatrice M :\n");
+                    afficherMatrix(M);
+
+                    t_matrix Mk  = createEmptyMatrix(n);
+                    t_matrix Mk1 = createEmptyMatrix(n);
+                    copyMatrix(Mk, M);
+                    int k = 1;
+
+                    while (1) {
+                        multiplyMatrices(Mk, M, Mk1);
+                        float d = diffMatrices(Mk, Mk1);
+                        float d2 = ((int)(d * 100 + 0.5)) / 100.0f;
+                        printf("\nDiff M^%d -> M^%d = %.4f (arrondi = %.2f)\n", k, k+1, d, d2);
+
+                        if (d2 <= epsilon) {
+                            printf("Convergence atteinte\n");
+                            break;
+                        }
+                        copyMatrix(Mk, Mk1);
+                        k++;
+                        if (k > 30) {
+                            printf("Pas de convergence\n");
+                            break;
+                        }
+                    }
+                    printf("\nMatrice finale (M^%d)\n", k);
+                    afficherMatrix(Mk);
+                    freeMatrix(M);
+                    freeMatrix(Mk);
+                    freeMatrix(Mk1);
+                }
+
+                printf("\n7. Distribution stationnaire par classes\n");
+                printStationaryForAllClasses(g, partition);
+                break;
+
+            case 0:
+
+                printf("Au revoir !\n");
+                continuer = 0;
+                break;
+
+            default:
+                printf("Choix invalide. Veuillez choisir un nombre entre 0 et 8.\n");
+                break;
         }
-        //si la boucle parcours trop d'itération, on sort de cette dernière
     }
 
-    printf("\nMatrice finale (M^%d)\n", k);
-    afficherMatrix(Mk);
-    freeMatrix(M);
-    freeMatrix(Mk);
-    freeMatrix(Mk1);
-    //affiche la matrice finale, et libère les 3 matrices pour lesquelles on a alloué de l'espace
 
-    //Distribution stationaire par classes___________________________________________________________________________
-
-    printStationaryForAllClasses(g, partition);
-
-    liberer_liens_array(liens);
-    liberer_partition(partition);
+    if (partition != NULL) {
+        liberer_partition(partition);
+    }
+    if (liens != NULL) {
+        liberer_liens_array(liens);
+    }
 
     return 0;
 }
