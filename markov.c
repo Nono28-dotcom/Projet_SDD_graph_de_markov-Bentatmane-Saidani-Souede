@@ -564,7 +564,7 @@ int analyser_caracteristiques(t_partition *part, t_liens_array *liens) {
             printf("État %d : %s (dans classe %s)\n", vid + 1, etat_type, part->classes[c].nom);
         }
     }
-    //on vérifie si le graphe est irréductible (une seule classe)
+    //on vérifie si le graphe est irréductible, s'il n'y a qu'une seule classe
     int irreductible = (nb_classes == 1) ? 1 : 0;
     printf("\nGraphe irréductible ? %s\n", irreductible ? "OUI" : "NON");
 
