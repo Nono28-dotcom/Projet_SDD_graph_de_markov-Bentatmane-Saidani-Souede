@@ -43,4 +43,7 @@ t_matrix subMatrix(t_matrix matrix, t_partition *part, int compo_index);
 t_matrix powerUntilLimit(t_matrix S, float eps, int max_iter);
 void printStationaryForAllClasses(liste_adjacence g, t_partition *part);
 
+void multiplyVectorMatrix(float *v, t_matrix M, float *res);
+void distributionAfterN(t_matrix M, int n);
+
 #endif //MATRIX_H

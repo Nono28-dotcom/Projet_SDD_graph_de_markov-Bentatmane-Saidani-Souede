@@ -12,7 +12,7 @@ int main(void) {
     char fichier[256];
     printf("    PROGRAMME D'ANALYSE DE GRAPHES DE MARKOV    \n\n");
     printf("Choisissez parmi cette liste un fichier graphe et copiez-collez son nom :\n");
-    printf("../Data/exemple1.txt\n../Data/exemple1_chatGPT_fixed.txt\n../Data/exemple2.txt\n../Data/exemple3.txt\n../Data/exemple4_2check.txt\n../Data/exemple_hasse1.txt\n../Data/exemple_meteo.txt\n../Data/exemple_scc1.txt\n../Data/exemple_valid_step3.txt\n");
+    printf("../Data/exemple1.txt\n../Data/exemple1_chatGPT_fixed.txt\n../Data/exemple2.txt\n../Data/exemple3.txt\n../Data/exemple4_2check.txt\n../Data/exemple_hasse1.txt\n../Data/exemple_meteo.txt\n../Data/exemple_scc1.txt\n../Data/exemple_valid_step3.txt\n../Data/Matrice_Projet.txt\n");
     printf("Nom du fichier : ");
     if (fgets(fichier, sizeof(fichier), stdin) == NULL) {
         fprintf(stderr, "Lecture du nom de fichier impossible.\n");
@@ -168,8 +168,8 @@ int main(void) {
                         copyMatrix(Mk, Mk1);
                         k++;
 
-                        if (k > 30) {
-                            printf("Pas de convergence après 30 itérations.\n");
+                        if (k > 50) {
+                            printf("Pas de convergence après 50 itérations.\n");
                             break;
                         }
                     }
@@ -252,7 +252,7 @@ int main(void) {
                         }
                         copyMatrix(Mk, Mk1);
                         k++;
-                        if (k > 30) {
+                        if (k > 50) {
                             printf("Pas de convergence\n");
                             break;
                         }
@@ -268,6 +268,21 @@ int main(void) {
                 printStationaryForAllClasses(g, partition);
                 break;
 
+
+            case 9:
+                printf("    DISTRIBUTIONS APRES 1, 10 et 50 PAS    \n");
+
+            {
+                t_matrix M = createMatrixFromAdjacency(g);
+
+                distributionAfterN(M, 1);
+                distributionAfterN(M, 10);
+                distributionAfterN(M, 50);
+
+                freeMatrix(M);
+            }
+            break;
+
             case 0:
 
                 printf("Au revoir !\n");
@@ -279,6 +294,7 @@ int main(void) {
                 break;
         }
     }
+
 
 
     if (partition != NULL) {

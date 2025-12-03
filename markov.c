@@ -22,7 +22,7 @@ cell* creat_cell(float prob, int arrivee) {
   new_cell->proba=prob;
   new_cell->sommet_arrivee=arrivee;
   new_cell->next=NULL;
-  //la cellule n'a pas besoin de champ next, on fixe alors la valeure a NULL
+  //la cellule n'a pas besoin de champ next, on fixe alors la valeur a NULL
   return new_cell;
 };
 
