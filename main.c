@@ -270,15 +270,20 @@ int main(void) {
 
 
             case 9:
-                printf("    DISTRIBUTIONS APRES 1, 10 et 50 PAS    \n");
+                printf("   DISTRIBUTIONS APRES 1, 2, 10 ET 50 PAS (X0 = 2)\n");
 
             {
+                int etat_initial = 2;
                 t_matrix M = createMatrixFromAdjacency(g);
+                float *pi = malloc(g.taille * sizeof(float));
 
-                distributionAfterN(M, 1);
-                distributionAfterN(M, 10);
-                distributionAfterN(M, 50);
+                int steps[4] = {1, 2, 10, 50};
+                for (int i = 0; i < 4; i++) {
+                    computePiN(M, etat_initial, steps[i], pi);
+                    printPiN(pi, steps[i], etat_initial);
+                }
 
+                free(pi);
                 freeMatrix(M);
             }
             break;

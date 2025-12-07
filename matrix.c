@@ -250,48 +250,45 @@ void printStationaryForAllClasses(liste_adjacence g, t_partition *part) {
 }
 
 
-// ---------------------------------------------------------
-// CALCUL D'UNE DISTRIBUTION DE PROBABILITÉS APRÈS n PAS
-// ---------------------------------------------------------
+// ============================================================
+// Calcul de la distribution Pi(n) avec X0 = etat_initial (1 à N)
+// ============================================================
 
-// multiplie un vecteur ligne par une matrice
-void multiplyVectorMatrix(float *v, t_matrix M, float *res) {
+void computePiN(t_matrix M, int etat_initial, int pas, float *result) {
     int n = M.rows;
 
-    for (int j = 0; j < n; j++) {
-        res[j] = 0;
-        for (int k = 0; k < n; k++) {
-            res[j] += v[k] * M.data[k][j];
-        }
+    // Vecteurs temporaires
+    float *pi  = calloc(n, sizeof(float));
+    float *tmp = calloc(n, sizeof(float));
+
+    // π(0) = e_(etat_initial)
+    pi[etat_initial - 1] = 1.0f;
+
+    // Calcul π(k+1) = π(k) * M
+    for (int k = 0; k < pas; k++) {
+        for (int j = 0; j < n; j++) tmp[j] = 0.0f;
+
+        for (int j = 0; j < n; j++)
+            for (int i = 0; i < n; i++)
+                tmp[j] += pi[i] * M.data[i][j];
+
+        for (int j = 0; j < n; j++) pi[j] = tmp[j];
     }
+
+    // Copie dans result[]
+    for (int j = 0; j < n; j++) result[j] = pi[j];
+
+    free(pi);
+    free(tmp);
 }
 
-// calcule la distribution après n pas
-void distributionAfterN(t_matrix M, int n) {
-    int size = M.rows;
+// ============================================================
+// Affichage formaté de π(n)
+// ============================================================
 
-    float *dist  = malloc(size * sizeof(float));
-    float *temp  = malloc(size * sizeof(float));
-
-    // vecteur initial uniforme
-    for (int i = 0; i < size; i++)
-        dist[i] = 1.0f / size;
-
-    // itération
-    for (int step = 0; step < n; step++) {
-        multiplyVectorMatrix(dist, M, temp);
-
-        // copie temp → dist
-        for (int i = 0; i < size; i++)
-            dist[i] = temp[i];
-    }
-
-    // affichage
-    printf("Distribution apres %d pas : [", n);
-    for (int i = 0; i < size; i++)
-        printf(" %.4f", dist[i]);
-    printf(" ]\n\n");
-
-    free(dist);
-    free(temp);
+void printPiN(float *pi, int n, int etat_initial) {
+    printf("\nPI(%d) avec X0 = %d : [ ", n, etat_initial);
+    for (int i = 0; i < 27; i++)
+        printf("%.6f ", pi[i]);
+    printf("]\n");
 }
