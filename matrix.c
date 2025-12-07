@@ -254,7 +254,7 @@ void printStationaryForAllClasses(liste_adjacence g, t_partition *part) {
 // Calcul de la distribution Pi(n) avec X0 = etat_initial (1 à N)
 // ============================================================
 
-void computePiN(t_matrix M, int etat_initial, int pas, float *result) {
+void PiN(t_matrix M, int etat_initial, int pas, float *result) {
     int n = M.rows;
 
     // Vecteurs temporaires
