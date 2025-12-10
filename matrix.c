@@ -288,7 +288,7 @@ void PiN(t_matrix M, int etat_initial, int pas, float *result) {
 
 void printPiN(float *pi, int n, int etat_initial) {
     printf("\nPI(%d) avec X0 = %d : [ ", n, etat_initial);
-    for (int i = 0; i < 27; i++)
+    for (int i = 0; i < 28; i++)
         printf("%.6f ", pi[i]);
     printf("]\n");
 }
