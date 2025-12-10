@@ -273,7 +273,7 @@ int main(void) {
                 printf("   DISTRIBUTIONS APRES 1, 2, 10 ET 50 PAS (X0 = 2)\n");
 
             {
-                int etat_initial = 28;
+                int etat_initial = 2;
                 t_matrix M = createMatrixFromAdjacency(g);
                 float *pi = malloc(g.taille * sizeof(float));
 
